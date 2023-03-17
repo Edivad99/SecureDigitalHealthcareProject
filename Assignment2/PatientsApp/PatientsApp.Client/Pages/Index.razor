@@ -1,0 +1,67 @@
+﻿@page "/"
+@inject HttpClient Http
+
+<PageTitle>Patients</PageTitle>
+
+<h1>Patients</h1>
+
+@if (patients == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Operations</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var patient in patients)
+            {
+                <tr>
+                    <td><a href="">@patient.Id.ToString("N").Substring(0, 5)</a></td>
+                    <td>@patient.FirstName</td>
+                    <td>@patient.LastName</td>
+                    <td>
+                        <div class="d-grid gap-2 d-md-block">
+                            <button type="button" class="btn btn-primary" @onclick="@(() => Edit(patient))">Edit</button>
+                            <button type="button" class="btn btn-danger" @onclick="@(() => Remove(patient))">Remove</button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<PatientDTO>? patients;
+
+    protected override async Task OnInitializedAsync()
+    {
+        patients = await Http.GetFromJsonAsync<List<PatientDTO>>("Patients");
+    }
+
+    private void Edit(PatientDTO patient)
+    {
+
+    }
+
+    private async Task Remove(PatientDTO patient)
+    {
+        var response = await Http.DeleteAsync($"Patients/{patient.Id}");
+        Console.WriteLine(response.StatusCode);
+        Console.WriteLine(response.IsSuccessStatusCode);
+
+        if (response.IsSuccessStatusCode)
+        {
+            patients = await Http.GetFromJsonAsync<List<PatientDTO>>("Patients");
+            StateHasChanged();
+        }
+    }
+}
