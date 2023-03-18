@@ -1,0 +1,65 @@
+﻿@page "/patient/{id}"
+@inject HttpClient Http
+
+<PageTitle>Patient details</PageTitle>
+
+
+@if (patient == null)
+{
+    <p hidden="!@HideWarning"><em>Loading...</em></p>
+    <div class="alert alert-danger" role="alert" hidden="@HideWarning">
+        Patient not found!
+    </div>
+}
+else
+{
+    <h1>@patient.FirstName @patient.LastName</h1>
+    <h3>
+        <small class="text-muted">@patient.Gender @patient.Birthdate</small>
+    </h3>
+    <address>
+        <a href="mailto:@patient.Email">Mail: @patient.Email</a><br>
+        <a href="tel:@patient.Phone">Phone: @patient.Phone</a>
+    </address>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Address</th>
+                <th>Password</th>
+                <th>Terms Accepted</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@patient.Id.ToString()</td>
+                <td>@patient.Address</td>
+                <td>@patient.Password</td>
+                <td>@(patient.Terms ? "Yes" : "No")</td>
+            </tr>
+        </tbody>
+    </table>
+
+}
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    private Patient? patient;
+    private bool HideWarning = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetAsync($"Patients/{Id}");
+        if (response.IsSuccessStatusCode)
+        {
+            patient = await response.Content.ReadFromJsonAsync<Patient>();
+        }
+        else
+        {
+            HideWarning = false;
+        }
+    }
+}

@@ -24,7 +24,7 @@ else
             @foreach (var patient in patients)
             {
                 <tr>
-                    <td><a href="">@patient.Id.ToString("N").Substring(0, 5)</a></td>
+                    <td><NavLink href="@GetRoute(patient.Id)">@patient.Id.ToString("N").Substring(0, 5)</NavLink></td>
                     <td>@patient.FirstName</td>
                     <td>@patient.LastName</td>
                     <td>
@@ -46,6 +46,8 @@ else
     {
         patients = await Http.GetFromJsonAsync<List<PatientDTO>>("Patients");
     }
+
+    private String GetRoute(Guid id) => $"/patient/{id.ToString()}";
 
     private void Edit(PatientDTO patient)
     {
