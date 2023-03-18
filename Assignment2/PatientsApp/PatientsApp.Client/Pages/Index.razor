@@ -15,21 +15,20 @@ else
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Firstname</th>
                 <th>Lastname</th>
-                <th>Operations</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var patient in patients)
             {
                 <tr>
-                    <td><NavLink href="@GetRoute(patient.Id)">@patient.Id.ToString("N").Substring(0, 5)</NavLink></td>
                     <td>@patient.FirstName</td>
                     <td>@patient.LastName</td>
                     <td>
-                        <div class="d-grid gap-2 d-md-block">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-success" @onclick="@(() => Info(patient))">Info</button>
                             <button type="button" class="btn btn-primary" @onclick="@(() => Edit(patient))">Edit</button>
                             <button type="button" class="btn btn-danger" @onclick="@(() => Remove(patient))">Remove</button>
                         </div>
@@ -48,19 +47,13 @@ else
         patients = await Http.GetFromJsonAsync<List<PatientDTO>>("Patients");
     }
 
-    private String GetRoute(Guid id) => $"/patient/{id.ToString()}";
+    private void Info(PatientDTO patient) => NavManager.NavigateTo($"/patient/{patient.Id.ToString()}");
 
-    private void Edit(PatientDTO patient)
-    {
-        NavManager.NavigateTo($"/editpatient/{patient.Id.ToString()}");
-    }
+    private void Edit(PatientDTO patient) => NavManager.NavigateTo($"/editpatient/{patient.Id.ToString()}");
 
     private async Task Remove(PatientDTO patient)
     {
         var response = await Http.DeleteAsync($"Patients/{patient.Id}");
-        Console.WriteLine(response.StatusCode);
-        Console.WriteLine(response.IsSuccessStatusCode);
-
         if (response.IsSuccessStatusCode)
         {
             patients = await Http.GetFromJsonAsync<List<PatientDTO>>("Patients");
