@@ -1,0 +1,81 @@
+﻿@page "/newpatient"
+@inject HttpClient Http
+@inject NavigationManager NavManager
+
+<PageTitle>New Patient</PageTitle>
+
+<h1>New Patient</h1>
+
+<div class="alert alert-danger" role="alert" hidden="@HideWarning">
+    Unable to add patient. Try again
+</div>
+
+<EditForm Model="@patient" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row">
+        <div class="col">
+            <InputText class="form-control" placeholder="Firstname" @bind-Value="patient.FirstName" />
+        </div>
+        <div class="col">
+            <InputText class="form-control" placeholder="Lastname" @bind-Value="patient.LastName" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <InputText class="form-control" placeholder="Email" type="email" @bind-Value="patient.Email" />
+        </div>
+        <div class="col">
+            <InputText class="form-control" placeholder="Password" type="password" @bind-Value="patient.Password" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <label for="gender">Gender</label>
+            <InputSelect id="gender" class="form-control" @bind-Value="patient.Gender">
+                <option value="male" selected>Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </InputSelect>
+        </div>
+        <div class="col">
+            <label for="birthdate">Birthdate</label>
+            <InputDate class="form-control" id="birthdate" @bind-Value="patient.Birthdate" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <InputText class="form-control" placeholder="Phone" type="tel" @bind-Value="patient.Phone" />
+        </div>
+        <div class="col">
+            <InputText class="form-control" placeholder="Address" @bind-Value="patient.Address" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-check">
+            <label class="form-check-label" for="acceptTos">Accept TOS</label>
+            <InputCheckbox class="form-check-input" id="acceptTos" @bind-Value="patient.Terms" />
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Submit</button>
+</EditForm>
+
+@code {
+    private Patient patient = new() { Gender = "male" };
+    private bool HideWarning = true;
+
+    private async Task HandleValidSubmit()
+    {
+        // Process the valid form
+        var response = await Http.PostAsJsonAsync("Patients", patient);
+        if (response.IsSuccessStatusCode)
+        {
+            NavManager.NavigateTo("/");
+        }
+        else
+        {
+            HideWarning = false;
+        }
+    }
+}
