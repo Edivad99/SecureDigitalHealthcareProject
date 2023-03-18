@@ -1,13 +1,13 @@
-﻿@page "/newpatient"
+﻿@page "/editpatient/{id}"
 @inject HttpClient Http
 @inject NavigationManager NavManager
 
-<PageTitle>New Patient</PageTitle>
+<PageTitle>Edit Patient</PageTitle>
 
-<h1>New Patient</h1>
+<h1>Edit Patient</h1>
 
 <div class="alert alert-danger" role="alert" hidden="@HideWarning">
-    Unable to add patient. Try again
+    Unable to modify patient. Try again
 </div>
 
 <EditForm Model="@patient" OnValidSubmit="@HandleValidSubmit">
@@ -34,7 +34,7 @@
         <div class="col">
             <label for="gender">Gender</label>
             <InputSelect id="gender" class="form-control" @bind-Value="patient.Gender">
-                <option value="Male" selected>Male</option>
+                <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
             </InputSelect>
@@ -58,17 +58,37 @@
             <InputCheckbox class="form-check-input" id="acceptTos" @bind-Value="patient.Terms" />
         </div>
     </div>
-    <button class="btn btn-primary" type="submit">Submit</button>
+    <button class="btn btn-primary" type="submit">Edit</button>
 </EditForm>
 
 @code {
-    private Patient patient = new() { Gender = "male" };
+    [Parameter]
+    public string? Id { get; set; }
+
+    private Patient patient = new();
     private bool HideWarning = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetAsync($"Patients/{Id}");
+        if (response.IsSuccessStatusCode)
+        {
+            patient = await response.Content.ReadFromJsonAsync<Patient>() ?? new();
+            if (patient is null)
+            {
+                patient = new();
+            }
+        }
+        else
+        {
+            HideWarning = false;
+        }
+    }
 
     private async Task HandleValidSubmit()
     {
         // Process the valid form
-        var response = await Http.PostAsJsonAsync("Patients", patient);
+        var response = await Http.PutAsJsonAsync($"Patients/{patient.Id}", patient);
         if (response.IsSuccessStatusCode)
         {
             NavManager.NavigateTo("/");

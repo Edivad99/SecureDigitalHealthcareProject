@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject HttpClient Http
+@inject NavigationManager NavManager
 
 <PageTitle>Patients</PageTitle>
 
@@ -51,7 +52,7 @@ else
 
     private void Edit(PatientDTO patient)
     {
-
+        NavManager.NavigateTo($"/editpatient/{patient.Id.ToString()}");
     }
 
     private async Task Remove(PatientDTO patient)

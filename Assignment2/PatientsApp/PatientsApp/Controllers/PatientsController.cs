@@ -99,7 +99,7 @@ public class PatientsController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult AddLikeToImage(Guid id, Patient patient)
+    public IActionResult EditPatient(Guid id, Patient patient)
     {
         int removedPatient = Patients.RemoveAll(x => x.Id == id);
         if (removedPatient == 0)
