@@ -47,7 +47,7 @@ public class PatientsController : ControllerBase
             Birthdate = new DateOnly(1980, 08, 15),
             Address = "Via M. Giove",
             Gender = "Male",
-            Phone = "+39 493028403",
+            Phone = "+39 4930284031",
             Terms = false
         },
     };

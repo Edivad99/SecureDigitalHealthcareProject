@@ -15,7 +15,7 @@ else
 {
     <h1>@patient.FirstName @patient.LastName</h1>
     <h3>
-        <small class="text-muted">@patient.Gender @patient.Birthdate</small>
+        <small class="text-muted">@patient.Gender @patient.Birthdate (@GetYearsOld(patient) years old)</small>
     </h3>
     <address>
         <a href="mailto:@patient.Email">Mail: @patient.Email</a><br>
@@ -48,6 +48,8 @@ else
 
     private Patient? patient;
     private bool HideWarning = true;
+
+    private int GetYearsOld(Patient p) => DateTime.Today.Year - p.Birthdate.Year;
 
     protected override async Task OnInitializedAsync()
     {
