@@ -1,0 +1,67 @@
+﻿@page "/registration"
+@inject HttpClient Http
+@inject NavigationManager NavManager
+
+<PageTitle>Registration</PageTitle>
+
+<h1>Registration</h1>
+
+<div class="alert alert-danger" role="alert" hidden="@HideWarning">
+    Unable to add a new user. Try again
+</div>
+
+<EditForm Model="@newUser" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row">
+        <div class="col">
+            <InputText class="form-control" placeholder="Email" type="email" @bind-Value="newUser.Email" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <InputText class="form-control" placeholder="Password" type="password" @bind-Value="newUser.Password" />
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Sign Up</button>
+</EditForm>
+
+
+@code {
+    private User newUser = new();
+    private bool HideWarning = true;
+
+    public async Task DoStuff(string email, string password)
+    {
+        var result = await Task.FromResult<string>(BCrypt.HashPassword(email + password));
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        // Process the valid form
+        var response = await Http.PostAsJsonAsync("Auth/signup", new User()
+        {
+            Email = newUser.Email,
+            Password = BCrypt.HashPassword(newUser.Email + newUser.Password)
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            NavManager.NavigateTo("/");
+        }
+        else
+        {
+            HideWarning = false;
+        }
+    }
+
+    private void PasswordChanged(ChangeEventArgs e)
+    {
+        var value = e?.Value?.ToString();
+        if (value != null && value.Length > 0)
+        {
+            Console.WriteLine(value);
+        }
+    }
+}
