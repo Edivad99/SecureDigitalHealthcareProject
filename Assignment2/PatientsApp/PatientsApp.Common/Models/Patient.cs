@@ -6,25 +6,25 @@ public class Patient
 {
     public Guid Id { get; set; }
     [Required]
-    public String FirstName { get; set; }
+    public string FirstName { get; set; }
     [Required]
-    public String LastName { get; set; }
+    public string LastName { get; set; }
     [Required]
     [EmailAddress]
-    public String Email { get; set; }
+    public string Email { get; set; }
     [Required]
     [MinLength(8)]
-    public String Password { get; set; }
+    public string Password { get; set; }
     [Required]
     [RegularExpression("Male|Female|Other")]
-    public String Gender { get; set; }
+    public string Gender { get; set; }
     [Required]
     public DateOnly Birthdate { get; set; }
     [Required]
-    public String Address { get; set; }
+    public string Address { get; set; }
     [Required]
     [Phone]
-    public String Phone { get; set; }
+    public string Phone { get; set; }
     [Required]
     public bool Terms { get; set; }
 }

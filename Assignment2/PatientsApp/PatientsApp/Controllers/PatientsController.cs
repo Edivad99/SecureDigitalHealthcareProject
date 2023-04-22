@@ -9,7 +9,7 @@ namespace PatientsApp.Controllers;
 [Route("[controller]")]
 public class PatientsController : ControllerBase
 {
-    private static List<Patient> Patients = new List<Patient>
+    private static List<Patient> Patients = new()
     {
         new Patient
         {
@@ -60,7 +60,7 @@ public class PatientsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetPatients()
     {
-        var res = Patients.Select(x => Create(x));
+        var res = Patients.Select(Create);
         return StatusCode(StatusCodes.Status200OK, res);
     }
 
@@ -132,7 +132,7 @@ public class PatientsController : ControllerBase
         return StatusCode(StatusCodes.Status204NoContent);
     }
 
-    private static PatientDTO Create(Patient patient) => new PatientDTO()
+    private static PatientDTO Create(Patient patient) => new()
     {
         Id = patient.Id,
         FirstName = patient.FirstName,
