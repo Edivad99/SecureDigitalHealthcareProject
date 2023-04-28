@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PatientsApp.Common.Models;
+using PatientsApp.Data.Repository;
 
 namespace PatientsApp.Server.Controllers;
 
@@ -7,15 +8,36 @@ namespace PatientsApp.Server.Controllers;
 [Route("[controller]")]
 public class AuthController : ControllerBase
 {
-    public AuthController()
+    private readonly AuthRepository repository;
+    private readonly ILogger<AuthController> logger;
+
+    public AuthController(AuthRepository repository, ILogger<AuthController> logger)
     {
+        this.repository = repository;
+        this.logger = logger;
     }
 
     [HttpPost("signup")]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public IActionResult SignUp(User user)
+    public async Task<IActionResult> SignUpAsync(User user)
     {
-        return StatusCode(StatusCodes.Status201Created);
+        try
+        {
+            logger.LogInformation($"New registration request");
+            await repository.AddUserAsync(new()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = user.Email,
+                Password = user.Password
+            });
+            logger.LogInformation($"Registration completed");
+            return StatusCode(StatusCodes.Status201Created);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, $"New error in SignUpAsync");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 }
 

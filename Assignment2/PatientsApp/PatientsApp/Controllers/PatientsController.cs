@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PatientsApp.Common.DTO;
 using PatientsApp.Common.Models;
+using PatientsApp.Data.Repository;
 
 namespace PatientsApp.Controllers;
 
@@ -8,134 +9,127 @@ namespace PatientsApp.Controllers;
 [Route("[controller]")]
 public class PatientsController : ControllerBase
 {
-    private static List<Patient> Patients = new()
-    {
-        new Patient
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "Mario",
-            LastName = "Rossi",
-            Email = "mario.rossi@gmail.com",
-            Password = "12345678",
-            Birthdate = new DateOnly(1999, 10, 15),
-            Address = "Via A. Rossi",
-            Gender = "Male",
-            Phone = "+39 3547282733",
-            Terms = true
-        },
-        new Patient
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "Lucia",
-            LastName = "Verdi",
-            Email = "lucia.verdi@gmail.com",
-            Password = "abcdefgh",
-            Birthdate = new DateOnly(1972, 04, 30),
-            Address = "Via G. Verdi",
-            Gender = "Female",
-            Phone = "+39 3453829984",
-            Terms = true
-        },
-        new Patient
-        {
-            Id = Guid.NewGuid(),
-            FirstName = "Giuseppe",
-            LastName = "Mazzini",
-            Email = "giuseppe.mazzini@gmail.com",
-            Password = "grgergergrg",
-            Birthdate = new DateOnly(1980, 08, 15),
-            Address = "Via M. Giove",
-            Gender = "Male",
-            Phone = "+39 4930284031",
-            Terms = false
-        },
-    };
+    private readonly PatientRepository repository;
 
-    public PatientsController()
+    public PatientsController(PatientRepository repository)
     {
+        this.repository = repository;
     }
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult GetPatients()
+    public async Task<IActionResult> GetPatientsAsync()
     {
-        var res = Patients.Select(Create);
-        return StatusCode(StatusCodes.Status200OK, res);
+        var patients = await repository.GetPatientsAsync();
+        return StatusCode(StatusCodes.Status200OK, patients.Select(MapToDTO));
     }
 
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult GetPatients(Guid id)
+    public async Task<IActionResult> GetPatient(Guid id)
     {
-        var patient = Patients.FirstOrDefault(x => x.Id == id);
+        var patient = await repository.GetPatientAsync(id);
         if (patient is null)
             return StatusCode(StatusCodes.Status404NotFound);
-        return StatusCode(StatusCodes.Status200OK, patient);
+        return StatusCode(StatusCodes.Status200OK, MapTo(patient));
+    }
+
+    [HttpGet("search/{name}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetPatientsByName(string name)
+    {
+        var patients = await repository.SearchPatientsByNameAsync(name);
+        if (!patients.Any())
+            return StatusCode(StatusCodes.Status404NotFound);
+        return StatusCode(StatusCodes.Status200OK, patients.Select(MapToDTO));
     }
 
     [HttpPost()]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    public IActionResult AddPatient(Patient patient)
+    public async Task<IActionResult> AddPatientAsync(Patient patient)
     {
-        var newPatient = new Patient()
+        try
         {
-            Id = Guid.NewGuid(),
-            FirstName = patient.FirstName,
-            LastName = patient.LastName,
-            Email = patient.Email,
-            Password = patient.Password,
-            Birthdate = patient.Birthdate,
-            Address = patient.Address,
-            Gender = patient.Gender,
-            Phone = patient.Phone,
-            Terms = patient.Terms
-        };
-        Patients.Add(newPatient);
-        return StatusCode(StatusCodes.Status201Created, Create(newPatient));
+            var newPatient = new Data.Entity.Patient()
+            {
+                Id = Guid.NewGuid().ToString(),
+                FirstName = patient.FirstName,
+                LastName = patient.LastName,
+                Email = patient.Email,
+                Password = patient.Password,
+                Birthdate = patient.Birthdate.ToDateTime(TimeOnly.MinValue),
+                Address = patient.Address,
+                Gender = patient.Gender,
+                Phone = patient.Phone,
+                Terms = patient.Terms
+            };
+
+            await repository.AddPatientAsync(newPatient);
+            return StatusCode(StatusCodes.Status201Created, MapToDTO(newPatient));
+        }
+        catch (Exception)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult EditPatient(Guid id, Patient patient)
+    public async Task<IActionResult> EditPatient(Guid id, Patient patient)
     {
-        int removedPatient = Patients.RemoveAll(x => x.Id == id);
-        if (removedPatient == 0)
-            return StatusCode(StatusCodes.Status404NotFound);
-        var newPatient = new Patient()
+        var updateRow = await repository.UpdatePatientAsync(new()
         {
-            Id = id,
+            Id = id.ToString(),
             FirstName = patient.FirstName,
             LastName = patient.LastName,
             Email = patient.Email,
             Password = patient.Password,
-            Birthdate = patient.Birthdate,
+            Birthdate = patient.Birthdate.ToDateTime(TimeOnly.MinValue),
             Address = patient.Address,
             Gender = patient.Gender,
             Phone = patient.Phone,
             Terms = patient.Terms
-        };
-        Patients.Add(newPatient);
-        return StatusCode(StatusCodes.Status201Created, Create(newPatient));
+        });
+
+        if (updateRow == 0)
+            return StatusCode(StatusCodes.Status404NotFound);
+        var newPatient = await repository.GetPatientAsync(id);
+        return StatusCode(StatusCodes.Status201Created, MapToDTO(newPatient));
     }
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult DeletePatient(Guid id)
+    public async Task<IActionResult> DeletePatient(Guid id)
     {
-        int removedPatient = Patients.RemoveAll(x => x.Id == id);
+        int removedPatient = await repository.DeletePatientAsync(id);
         if (removedPatient == 0)
             return StatusCode(StatusCodes.Status404NotFound);
         return StatusCode(StatusCodes.Status204NoContent);
     }
 
-    private static PatientDTO Create(Patient patient) => new()
+    private static PatientDTO MapToDTO(Data.Entity.Patient patient) => new()
     {
-        Id = patient.Id,
+        Id = Guid.Parse(patient.Id),
         FirstName = patient.FirstName,
         LastName = patient.LastName
+    };
+
+    private static Patient MapTo(Data.Entity.Patient patient) => new()
+    {
+        Id = Guid.Parse(patient.Id),
+        FirstName = patient.FirstName,
+        LastName = patient.LastName,
+        Email = patient.Email,
+        Password = patient.Password,
+        Birthdate = DateOnly.FromDateTime(patient.Birthdate),
+        Address = patient.Address,
+        Gender = patient.Gender,
+        Phone = patient.Phone,
+        Terms = patient.Terms
     };
 }
 

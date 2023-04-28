@@ -1,4 +1,8 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using PatientsApp.Data.Repository;
+
+var builder = WebApplication.CreateBuilder(args);
+
+string connectionString = builder.Configuration.GetConnectionString("MySQL");
 
 // Add services to the container.
 
@@ -23,6 +27,8 @@ builder.Services.AddCors(opt =>
             .AllowCredentials());
 });
 
+builder.Services.AddSingleton(_ => new AuthRepository(connectionString));
+builder.Services.AddSingleton(_ => new PatientRepository(connectionString));
 
 var app = builder.Build();
 

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatientsApp.Common", "Patie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatientsApp.Client", "PatientsApp.Client\PatientsApp.Client.csproj", "{1C77ADDB-A484-4CE8-9D19-ADC33115E803}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatientsApp.Data", "PatientsApp.Data\PatientsApp.Data.csproj", "{6EEB7106-AFBE-437F-BA4A-EE8EEA0A8D3F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{1C77ADDB-A484-4CE8-9D19-ADC33115E803}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C77ADDB-A484-4CE8-9D19-ADC33115E803}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C77ADDB-A484-4CE8-9D19-ADC33115E803}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EEB7106-AFBE-437F-BA4A-EE8EEA0A8D3F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EEB7106-AFBE-437F-BA4A-EE8EEA0A8D3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EEB7106-AFBE-437F-BA4A-EE8EEA0A8D3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EEB7106-AFBE-437F-BA4A-EE8EEA0A8D3F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
