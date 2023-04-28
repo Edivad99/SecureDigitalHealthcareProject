@@ -10,7 +10,7 @@
     Unable to modify patient. Try again
 </div>
 
-<EditForm Model="@patient" OnValidSubmit="@HandleValidSubmit">
+<EditForm Model="@patient" OnValidSubmit="@HandleValidSubmit" autocomplete="off">
     <DataAnnotationsValidator />
     <ValidationSummary />
 

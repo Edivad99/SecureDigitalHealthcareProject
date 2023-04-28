@@ -10,7 +10,7 @@
     Unable to add a new user. Try again
 </div>
 
-<EditForm Model="@newUser" OnValidSubmit="@HandleValidSubmit">
+<EditForm Model="@newUser" OnValidSubmit="@HandleValidSubmit" autocomplete="off">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
