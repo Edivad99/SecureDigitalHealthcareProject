@@ -12,4 +12,5 @@ public class Patient
     public string Address { get; set; }
     public string Phone { get; set; }
     public bool Terms { get; set; }
+    public string ProfilePicture { get; set; }
 }

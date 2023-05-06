@@ -7,7 +7,7 @@
 <h1>New Patient</h1>
 
 <div class="alert alert-danger" role="alert" hidden="@HideWarning">
-    Unable to add patient. Try again
+    Unable to add patient. Check the inputs and try again!
 </div>
 
 <EditForm Model="@patient" OnValidSubmit="@HandleValidSubmit">
@@ -53,7 +53,11 @@
         </div>
     </div>
     <div class="row">
-        <div class="form-check">
+        <div class="col">
+            <label for="profilePhoto" class="form-label">Profile photo</label>
+            <InputFile class="form-control" id="profilePhoto" OnChange="@LoadFile" accept=".jpg,.png" />
+        </div>
+        <div class="col form-check">
             <label class="form-check-label" for="acceptTos">Accept TOS</label>
             <InputCheckbox class="form-check-input" id="acceptTos" @bind-Value="patient.Terms" />
         </div>
@@ -62,15 +66,54 @@
 </EditForm>
 
 @code {
-    private Patient patient = new() { Gender = "male" };
+    private PatientRequest patient = new() { Gender = "male" };
+    private StreamContent? imageContent;
+    private string[] supportedExtension = { ".jpg", ".png" };
+    private string imageExtension = string.Empty;
     private bool HideWarning = true;
+
+    void LoadFile(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file != null)
+        {
+            imageContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 4096000));
+            imageContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+            imageExtension = Path.GetExtension(file.Name);
+        }
+    }
 
     private async Task HandleValidSubmit()
     {
+        HideWarning = true;
+        if (imageContent is null)
+        {
+            HideWarning = false;
+            return;
+        }
+        if (!supportedExtension.Contains(imageExtension.ToLower()))
+        {
+            HideWarning = false;
+            return;
+        }
+
+        using var content = new MultipartFormDataContent();
+        content.Add(imageContent, "Image", $"profilePicture.{imageExtension}");
+        content.Add(new StringContent(patient.FirstName), nameof(patient.FirstName));
+        content.Add(new StringContent(patient.LastName), nameof(patient.LastName));
+        content.Add(new StringContent(patient.Email), nameof(patient.Email));
+        content.Add(new StringContent(patient.Password), nameof(patient.Password));
+        content.Add(new StringContent(patient.Gender), nameof(patient.Gender));
+        content.Add(new StringContent(patient.Birthdate.ToString()), nameof(patient.Birthdate));
+        content.Add(new StringContent(patient.Address), nameof(patient.Address));
+        content.Add(new StringContent(patient.Phone), nameof(patient.Phone));
+        content.Add(new StringContent(patient.Terms.ToString()), nameof(patient.Terms));
+
         // Process the valid form
-        var response = await Http.PostAsJsonAsync("Patients", patient);
+        var response = await Http.PostAsync("Patients", content);
         if (response.IsSuccessStatusCode)
         {
+            imageContent.Dispose();
             NavManager.NavigateTo("/");
         }
         else

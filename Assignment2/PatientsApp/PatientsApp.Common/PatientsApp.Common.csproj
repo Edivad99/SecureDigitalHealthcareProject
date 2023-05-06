@@ -16,5 +16,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="zxcvbn-core" Version="7.0.92" />
+	  <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
 	</ItemGroup>
 </Project>

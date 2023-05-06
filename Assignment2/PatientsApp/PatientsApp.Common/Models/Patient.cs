@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace PatientsApp.Common.Models;
 
-public class Patient
+public abstract class Patient
 {
-    public Guid Id { get; set; }
     [Required]
     public string FirstName { get; set; }
     [Required]
@@ -27,4 +27,9 @@ public class Patient
     public string Phone { get; set; }
     [Required]
     public bool Terms { get; set; }
+}
+
+public class PatientRequest : Patient
+{
+    public IFormFile Image { get; set; }
 }

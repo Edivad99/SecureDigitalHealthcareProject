@@ -65,7 +65,7 @@
     [Parameter]
     public string? Id { get; set; }
 
-    private Patient patient = new();
+    private PatientDTO patient = new();
     private bool HideWarning = true;
 
     protected override async Task OnInitializedAsync()
@@ -73,7 +73,7 @@
         var response = await Http.GetAsync($"Patients/{Id}");
         if (response.IsSuccessStatusCode)
         {
-            patient = await response.Content.ReadFromJsonAsync<Patient>() ?? new();
+            patient = await response.Content.ReadFromJsonAsync<PatientDTO>() ?? new();
             if (patient is null)
             {
                 patient = new();

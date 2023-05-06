@@ -14,7 +14,7 @@ public class PatientRepository : Repository
     {
         var sql = @"INSERT INTO `Patients` (`Id`, `FirstName`, `LastName`, `Email`, `Password`, `Gender`, `Birthdate`, `Address`, `Phone`, `Terms`) VALUES
                   (@ID1, 'Mario', 'Rossi', 'mario.rossi@gmail.com', '12345678', 'Male', '1999-10-15', 'Via. A. Rossi', '+39 3547282733', true),
-                  (@ID2, 'Lucia', 'Verdi', 'lucia.verdi@gmail.com', 'abcdefgh', 'Female', '1972-04-30', 'Via G. Verdi', '+39 3453829984', true),
+                  (@ID2, 'Tina', 'Anselmi', 'tina.anselmi@gmail.com', 'abcdefgh', 'Female', '1927-03-25', 'Via G. Verdi', '+39 3453829984', true),
                   (@ID3, 'Giuseppe', 'Mazzini', 'giuseppe.mazzini@gmail.com', 'grgergergrg', 'Male', '1980-08-15', 'Via M. Giove', '+39 4930284031', false);";
 
         var dynamicParameters = new DynamicParameters();
@@ -28,8 +28,8 @@ public class PatientRepository : Repository
 
     public async Task AddPatientAsync(Patient patient)
     {
-        var sql = @"INSERT INTO `Patients` (`Id`, `FirstName`, `LastName`, `Email`, `Password`, `Gender`, `Birthdate`, `Address`, `Phone`, `Terms`) VALUES
-                  (@ID, @FIRSTNAME, @LASTNAME, @EMAIL, @PASSWORD, @GENDER, @BIRTHDATE, @ADDRESS, @PHONE, @TERMS);";
+        var sql = @"INSERT INTO `Patients` (`Id`, `FirstName`, `LastName`, `Email`, `Password`, `Gender`, `Birthdate`, `Address`, `Phone`, `Terms`, `ProfilePicture`) VALUES
+                  (@ID, @FIRSTNAME, @LASTNAME, @EMAIL, @PASSWORD, @GENDER, @BIRTHDATE, @ADDRESS, @PHONE, @TERMS, @PROFILEPICTURE);";
 
         var dynamicParameters = new DynamicParameters();
         dynamicParameters.Add("@ID", patient.Id, DbType.String, ParameterDirection.Input);
@@ -42,6 +42,7 @@ public class PatientRepository : Repository
         dynamicParameters.Add("@ADDRESS", patient.Address, DbType.String, ParameterDirection.Input);
         dynamicParameters.Add("@PHONE", patient.Phone, DbType.String, ParameterDirection.Input);
         dynamicParameters.Add("@TERMS", patient.Terms, DbType.Boolean, ParameterDirection.Input);
+        dynamicParameters.Add("@PROFILEPICTURE", patient.ProfilePicture, DbType.String, ParameterDirection.Input);
 
         using var conn = GetDbConnection();
         await conn.ExecuteAsync(sql, dynamicParameters);

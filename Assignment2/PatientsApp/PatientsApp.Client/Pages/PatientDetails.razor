@@ -17,6 +17,7 @@ else
     <h3>
         <small class="text-muted">@patient.Gender @patient.Birthdate (@GetYearsOld(patient) years old)</small>
     </h3>
+    <img src="@patient.ProfilePicture" class="img-thumbnail" alt="@(patient.FirstName + " " + patient.LastName)'s profile picture" />
     <address>
         <a href="mailto:@patient.Email">Mail: @patient.Email</a><br>
         <a href="tel:@patient.Phone">Phone: @patient.Phone</a>
@@ -46,7 +47,7 @@ else
     [Parameter]
     public string? Id { get; set; }
 
-    private Patient? patient;
+    private PatientDTO? patient;
     private bool HideWarning = true;
 
     private int GetYearsOld(Patient p) => DateTime.Today.Year - p.Birthdate.Year;
@@ -56,7 +57,7 @@ else
         var response = await Http.GetAsync($"Patients/{Id}");
         if (response.IsSuccessStatusCode)
         {
-            patient = await response.Content.ReadFromJsonAsync<Patient>();
+            patient = await response.Content.ReadFromJsonAsync<PatientDTO>();
         }
         else
         {

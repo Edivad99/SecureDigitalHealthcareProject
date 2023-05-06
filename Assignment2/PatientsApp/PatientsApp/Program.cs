@@ -1,8 +1,10 @@
 ﻿using PatientsApp.Data.Repository;
+using Microsoft.Extensions.Azure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 string connectionString = builder.Configuration.GetConnectionString("MySQL");
+string storageString = builder.Configuration.GetConnectionString("StorageConnection");
 
 // Add services to the container.
 
@@ -25,6 +27,11 @@ builder.Services.AddCors(opt =>
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials());
+});
+
+builder.Services.AddAzureClients(azureBuilder =>
+{
+    azureBuilder.AddBlobServiceClient(storageString);
 });
 
 builder.Services.AddSingleton(_ => new AuthRepository(connectionString));
