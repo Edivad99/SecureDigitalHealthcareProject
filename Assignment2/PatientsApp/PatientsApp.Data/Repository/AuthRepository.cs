@@ -23,5 +23,18 @@ public class AuthRepository : Repository
         using var conn = GetDbConnection();
         await conn.ExecuteAsync(sql, dynamicParameters);
     }
+
+    public async Task<User> GetUserByEmailAsync(string email)
+    {
+        var sql = @"SELECT *
+                    FROM Users
+                    WHERE Email = @EMAIL;";
+
+        var dynamicParameters = new DynamicParameters();
+        dynamicParameters.Add("@EMAIL", email, DbType.String, ParameterDirection.Input);
+
+        using var conn = GetDbConnection();
+        return await conn.QueryFirstOrDefaultAsync<User>(sql, dynamicParameters);
+    }
 }
 

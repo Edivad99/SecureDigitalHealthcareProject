@@ -32,15 +32,10 @@
     private User newUser = new();
     private bool HideWarning = true;
 
-    public async Task DoStuff(string email, string password)
-    {
-        var result = await Task.FromResult<string>(BCrypt.HashPassword(email + password));
-    }
-
     private async Task HandleValidSubmit()
     {
         // Process the valid form
-        var response = await Http.PostAsJsonAsync("Auth/signup", new User()
+        var response = await Http.PostAsJsonAsync("Auth/registration", new User()
         {
             Email = newUser.Email,
             Password = BCrypt.HashPassword(newUser.Email + newUser.Password)
@@ -53,15 +48,6 @@
         else
         {
             HideWarning = false;
-        }
-    }
-
-    private void PasswordChanged(ChangeEventArgs e)
-    {
-        var value = e?.Value?.ToString();
-        if (value != null && value.Length > 0)
-        {
-            Console.WriteLine(value);
         }
     }
 }
