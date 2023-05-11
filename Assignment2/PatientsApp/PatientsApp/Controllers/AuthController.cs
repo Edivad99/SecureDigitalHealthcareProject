@@ -1,10 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+using Google.Authenticator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using PatientsApp.Common.DTO;
 using PatientsApp.Common.Models;
 using PatientsApp.Data.Repository;
 
@@ -14,38 +17,47 @@ namespace PatientsApp.Server.Controllers;
 [Route("[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly AuthRepository repository;
-    private readonly IConfiguration configuration;
-    private readonly ILogger<AuthController> logger;
+    private static readonly TimeSpan timeTolerance = TimeSpan.FromSeconds(30);
 
-    public AuthController(AuthRepository repository, IConfiguration configuration, ILogger<AuthController> logger)
+    private readonly AuthRepository repository;
+    private readonly TwoFactorAuthenticator twoFactAuth;
+    private readonly IConfiguration configuration;
+
+    public AuthController(AuthRepository repository, TwoFactorAuthenticator twoFactAuth, IConfiguration configuration)
     {
         this.repository = repository;
+        this.twoFactAuth = twoFactAuth;
         this.configuration = configuration;
-        this.logger = logger;
     }
 
     [AllowAnonymous]
     [HttpPost("registration")]
     [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RegistrationAsync(User user)
     {
         try
         {
-            logger.LogInformation($"New registration request");
+            string key = Convert.ToBase64String(RandomNumberGenerator.GetBytes(8)); // 12 characters
             var userDB = new Data.Entity.User()
             {
                 Id = Guid.NewGuid().ToString(),
                 Email = user.Email,
-                Password = user.Password
+                Password = user.Password,
+                Key2FA = key
             };
             await repository.AddUserAsync(userDB);
-            logger.LogInformation($"Registration completed");
-            return StatusCode(StatusCodes.Status201Created);
+
+            var setupInfo = twoFactAuth.GenerateSetupCode("PatientsApp", userDB.Email, key, false, 3);
+
+            return StatusCode(StatusCodes.Status201Created, new GoogleAuthDTO
+            {
+                QrCodeImageUrl = setupInfo.QrCodeSetupImageUrl,
+                ManualEntrySetupCode = setupInfo.ManualEntryKey
+            });
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            logger.LogError(e, $"New error in SignUpAsync");
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
@@ -55,7 +67,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LogInAsync([FromForm(Name = "username"), Required] string username,
-                                                [FromForm(Name = "password"), Required] string password)
+                                                [FromForm(Name = "password"), Required] string password/*,
+                                                [FromForm(Name = "twofa_code"), Required] string twofa_code*/)
     {
         var userDB = await repository.GetUserByEmailAsync(username);
         if (userDB is null)
@@ -67,6 +80,11 @@ public class AuthController : ControllerBase
         {
             return StatusCode(StatusCodes.Status404NotFound);
         }
+
+        /*if (!twoFactAuth.ValidateTwoFactorPIN(userDB.Key2FA, twofa_code, timeTolerance))
+        {
+            return StatusCode(StatusCodes.Status404NotFound);
+        }*/
 
         return StatusCode(StatusCodes.Status200OK, CreateToken(userDB));
     }

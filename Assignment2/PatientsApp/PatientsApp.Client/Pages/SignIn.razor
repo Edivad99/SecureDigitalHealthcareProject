@@ -1,0 +1,75 @@
+﻿@page "/signin"
+@inject HttpClient Http
+@inject NavigationManager NavManager
+
+<h3>Sign In</h3>
+
+<div class="alert alert-danger" role="alert" hidden="@HideWarning">
+    Unable to add a new user. Try again
+</div>
+
+@if (!showAuthenticationQR)
+{
+    <EditForm Model="model" OnValidSubmit="ExecuteRegistration" class="card card-body bg-light mt-5" autocomplete="off">
+        <DataAnnotationsValidator />
+
+        <div class="form-row col-md-10">
+            <ValidationMessage For="@(() => model.Email)" />
+            <InputText id="email" class="form-control margin-input" @bind-Value="model.Email" placeholder="Email" />
+        </div>
+        <div class="form-row col-md-10">
+            <ValidationMessage For="@(() => model.Password)" />
+            <InputText type="password" id="password" class="form-control margin-input" @bind-Value="model.Password" placeholder="Password" />
+        </div>
+        <div class="row">
+            <div class="btn-group col-md-12 text-right">
+                <button type="submit" class="btn btn-primary">Sign In</button>
+                <NavLink class="btn btn-secondary" href="/login">Log In</NavLink>
+            </div>
+        </div>
+    </EditForm>
+}
+else
+{
+    <div class="card card-body bg-light mt-5">
+        <p>Scan the QR Code or enter this key: <kbd>@twoFAModel.ManualEntrySetupCode</kbd></p>
+        <img src="@twoFAModel.QrCodeImageUrl" width="200" alt="qr code" />
+        <NavLink href="login" class="btn btn-danger">Done</NavLink>
+    </div>
+}
+
+@code {
+    private bool showAuthenticationQR = false;
+    private User model = new();
+    private GoogleAuthDTO twoFAModel = new();
+    private bool HideWarning = true;
+
+    private async Task ExecuteRegistration()
+    {
+        // Process the valid form
+        var response = await Http.PostAsJsonAsync("Auth/registration", new User()
+        {
+            Email = model.Email,
+            Password = BCrypt.HashPassword(model.Email + model.Password)
+        });
+
+        if (!response.IsSuccessStatusCode)
+        {
+            HideWarning = false;
+            return;
+        }
+        NavManager.NavigateTo("/login");
+
+        /*
+        var content = await response.Content.ReadFromJsonAsync<GoogleAuthDTO>();
+        if (content != null)
+        {
+            twoFAModel = new()
+            {
+                QrCodeImageUrl = content.QrCodeImageUrl,
+                ManualEntrySetupCode = content.ManualEntrySetupCode
+            };
+            showAuthenticationQR = true;
+        }*/
+    }
+}

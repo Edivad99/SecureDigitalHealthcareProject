@@ -19,7 +19,7 @@ a, .btn-link {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 .content {
@@ -36,6 +36,18 @@ a, .btn-link {
 
 .validation-message {
     color: red;
+}
+
+.margin-input {
+    margin-bottom: 10px;
+}
+
+kbd {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.875em;
+    color: #fff;
+    background-color: #212529;
+    border-radius: 0.2rem;
 }
 
 #blazor-error-ui {
@@ -99,4 +111,3 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
-

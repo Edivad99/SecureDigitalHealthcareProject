@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Headers;
-using System.Text.Json;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using PatientsApp.Client.Models;
@@ -26,7 +25,8 @@ public class AuthenticationService : IAuthenticationService
         var data = new FormUrlEncodedContent(new[]
         {
             new KeyValuePair<string, string>("username", user.Email),
-            new KeyValuePair<string, string>("password", user.Password)
+            new KeyValuePair<string, string>("password", user.Password),
+            new KeyValuePair<string, string>("twofa_code", user.TwoFACode)
         });
 
         var authResult = await httpClient.PostAsync("Auth/login", data);

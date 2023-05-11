@@ -5,17 +5,15 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System.Configuration;
+using Google.Authenticator;
 
 var builder = WebApplication.CreateBuilder(args);
 
 string connectionString = builder.Configuration.GetConnectionString("MySQL");
 string storageString = builder.Configuration.GetConnectionString("StorageConnection");
-
-// Add services to the container.
+string jwtToken = builder.Configuration.GetSection("AppSettings:Token").Value;
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -72,7 +70,7 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtToken)),
         RequireExpirationTime = true,
         ClockSkew = TimeSpan.Zero
     };
@@ -83,6 +81,8 @@ builder.Services.AddAuthentication(options =>
     //Imposta tutti i controller per richiedere di default autenticazione
     options.FallbackPolicy = options.DefaultPolicy;
 });*/
+
+builder.Services.AddScoped(_ => new TwoFactorAuthenticator());
 
 builder.Services.AddAzureClients(azureBuilder =>
 {
