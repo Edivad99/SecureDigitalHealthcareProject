@@ -24,7 +24,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <InputText class="form-control" placeholder="Email" type="email" @bind-Value="patient.Email" />
+            <InputText class="form-control" placeholder="Email" type="email" @bind-Value="patient.Email" disabled />
         </div>
         <div class="col">
             <InputText class="form-control" placeholder="Password" type="password" @bind-Value="patient.Password" />
@@ -78,6 +78,10 @@
             {
                 patient = new();
             }
+            else
+            {
+                patient.Password = "";
+            }
         }
         else
         {
@@ -88,6 +92,7 @@
     private async Task HandleValidSubmit()
     {
         // Process the valid form
+        patient.Password = BCrypt.HashPassword(patient.Email + patient.Password);
         var response = await Http.PutAsJsonAsync($"Patients/{patient.Id}", patient);
         if (response.IsSuccessStatusCode)
         {

@@ -12,16 +12,17 @@ public class AuthRepository : Repository
 
     public async Task AddUserAsync(User user)
     {
-        var sql = @"INSERT INTO `Users` (`Id`, `Email`, `Password`) VALUES
-                  (@ID, @EMAIL, @PASSWORD);";
+        var sql = @"INSERT INTO `Users` (`Id`, `Email`, `Password`, `Role`) VALUES
+                  (@ID, @EMAIL, @PASSWORD, @ROLE);";
 
-        var dynamicParameters = new DynamicParameters();
-        dynamicParameters.Add("@ID", user.Id, DbType.String, ParameterDirection.Input);
-        dynamicParameters.Add("@EMAIL", user.Email, DbType.String, ParameterDirection.Input);
-        dynamicParameters.Add("@PASSWORD", user.Password, DbType.String, ParameterDirection.Input);
+        var dynParam = new DynamicParameters();
+        dynParam.Add("@ID", user.Id, DbType.String, ParameterDirection.Input);
+        dynParam.Add("@EMAIL", user.Email, DbType.String, ParameterDirection.Input);
+        dynParam.Add("@PASSWORD", user.Password, DbType.String, ParameterDirection.Input);
+        dynParam.Add("@ROLE", user.Role, DbType.String, ParameterDirection.Input);
 
         using var conn = GetDbConnection();
-        await conn.ExecuteAsync(sql, dynamicParameters);
+        await conn.ExecuteAsync(sql, dynParam);
     }
 
     public async Task<User> GetUserByEmailAsync(string email)
@@ -30,11 +31,11 @@ public class AuthRepository : Repository
                     FROM Users
                     WHERE Email = @EMAIL;";
 
-        var dynamicParameters = new DynamicParameters();
-        dynamicParameters.Add("@EMAIL", email, DbType.String, ParameterDirection.Input);
+        var dynParam = new DynamicParameters();
+        dynParam.Add("@EMAIL", email, DbType.String, ParameterDirection.Input);
 
         using var conn = GetDbConnection();
-        return await conn.QueryFirstOrDefaultAsync<User>(sql, dynamicParameters);
+        return await conn.QueryFirstOrDefaultAsync<User>(sql, dynParam);
     }
 }
 

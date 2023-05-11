@@ -110,7 +110,7 @@ public class PatientsController : ControllerBase
             Id = id.ToString(),
             FirstName = patient.FirstName,
             LastName = patient.LastName,
-            Email = patient.Email,
+            Email = patient.Email, //IGNORE
             Password = patient.Password,
             Birthdate = patient.Birthdate.ToDateTime(TimeOnly.MinValue),
             Address = patient.Address,

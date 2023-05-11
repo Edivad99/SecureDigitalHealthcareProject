@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace PatientsApp.Common.Models;
 
-public abstract class Patient
+public class Patient
 {
     [Required]
     public string FirstName { get; set; }
