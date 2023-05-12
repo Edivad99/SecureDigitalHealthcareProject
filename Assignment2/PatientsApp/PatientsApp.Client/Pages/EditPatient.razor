@@ -74,14 +74,7 @@
         if (response.IsSuccessStatusCode)
         {
             patient = await response.Content.ReadFromJsonAsync<PatientDTO>() ?? new();
-            if (patient is null)
-            {
-                patient = new();
-            }
-            else
-            {
-                patient.Password = "";
-            }
+            patient.Password = "";
         }
         else
         {

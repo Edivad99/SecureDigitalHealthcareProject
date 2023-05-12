@@ -97,6 +97,8 @@
             return;
         }
 
+        patient.Password = BCrypt.HashPassword(patient.Email + patient.Password);
+
         using var content = new MultipartFormDataContent();
         content.Add(imageContent, "Image", $"profilePicture.{imageExtension}");
         content.Add(new StringContent(patient.FirstName), nameof(patient.FirstName));

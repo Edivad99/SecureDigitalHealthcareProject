@@ -60,7 +60,7 @@ public class PatientsController : ControllerBase
     {
         try
         {
-            var username = (patient.FirstName + patient.LastName).ToLower();
+            var username = (patient.FirstName + patient.LastName).ToLower().Replace(" ", "");
             string imageName = string.Empty;
             if (patient.Image != null)
             {
@@ -94,9 +94,9 @@ public class PatientsController : ControllerBase
 
             return StatusCode(StatusCodes.Status201Created, MapToDTO(newPatient));
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            return StatusCode(StatusCodes.Status500InternalServerError, e);
         }
     }
 
@@ -136,7 +136,7 @@ public class PatientsController : ControllerBase
         if (removedPatient == 0)
             return StatusCode(StatusCodes.Status404NotFound);
 
-        var username = (patient.FirstName + patient.LastName).ToLower();
+        var username = (patient.FirstName + patient.LastName).ToLower().Replace(" ", "");
         var containerClient = blobServiceClient.GetBlobContainerClient(username);
         await containerClient.DeleteIfExistsAsync();
         return StatusCode(StatusCodes.Status204NoContent);

@@ -14,7 +14,7 @@ public class PatientRepository : Repository
     public async Task AddPatientAsync(Patient patient)
     {
         var sql = @"INSERT INTO `Patients` (`Id`, `FirstName`, `LastName`, `Gender`, `Birthdate`, `Address`, `Phone`, `Terms`, `ProfilePicture`) VALUES
-                  (@ID, @FIRSTNAME, @LASTNAME, @EMAIL, @PASSWORD, @GENDER, @BIRTHDATE, @ADDRESS, @PHONE, @TERMS, @PROFILEPICTURE);";
+                  (@ID, @FIRSTNAME, @LASTNAME, @GENDER, @BIRTHDATE, @ADDRESS, @PHONE, @TERMS, @PROFILEPICTURE);";
 
         var dynParam = new DynamicParameters();
         dynParam.Add("@ID", patient.Id, DbType.String, ParameterDirection.Input);
@@ -36,20 +36,20 @@ public class PatientRepository : Repository
         dynParam2.Add("@PASSWORD", patient.Password, DbType.String, ParameterDirection.Input);
         dynParam2.Add("@ROLE", patient.Role, DbType.String, ParameterDirection.Input);
 
-        using var conn = GetDbConnection();
-        conn.Open();
-        using var transaction = conn.BeginTransaction();
+        await using var conn = GetDbConnection();
+        await conn.OpenAsync();
+        await using var transaction = await conn.BeginTransactionAsync();
         try
         {
             await transaction.ExecuteAsync(sql2, dynParam2);
             await transaction.ExecuteAsync(sql, dynParam);
-            transaction.Commit();
+            await transaction.CommitAsync();
         }
         catch (Exception ex)
         {
             try
             {
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
             catch (Exception ex2)
             {
@@ -59,7 +59,7 @@ public class PatientRepository : Repository
         }
         finally
         {
-            conn.Close();
+            await conn.CloseAsync();
         }
     }
 
@@ -69,7 +69,7 @@ public class PatientRepository : Repository
                     FROM Patients
                     INNER JOIN Users ON Users.Id = Patients.Id;";
 
-        using var conn = GetDbConnection();
+        await using var conn = GetDbConnection();
         return await conn.QueryAsync<Patient>(sql);
     }
 
@@ -83,7 +83,7 @@ public class PatientRepository : Repository
         var dynParam = new DynamicParameters();
         dynParam.Add("@ID", id.ToString(), DbType.String, ParameterDirection.Input);
 
-        using var conn = GetDbConnection();
+        await using var conn = GetDbConnection();
         return await conn.QueryFirstOrDefaultAsync<Patient>(sql, dynParam);
     }
 
@@ -94,7 +94,7 @@ public class PatientRepository : Repository
         var dynParam = new DynamicParameters();
         dynParam.Add("@ID", id.ToString(), DbType.String, ParameterDirection.Input);
 
-        using var conn = GetDbConnection();
+        await using var conn = GetDbConnection();
         return await conn.ExecuteAsync(sql, dynParam);
     }
 
@@ -124,21 +124,21 @@ public class PatientRepository : Repository
         dynParam2.Add("@ID", newPatient.Id.ToString(), DbType.String, ParameterDirection.Input);
         dynParam2.Add("@PASSWORD", newPatient.Password, DbType.String, ParameterDirection.Input);
 
-        using var conn = GetDbConnection();
+        await using var conn = GetDbConnection();
         conn.Open();
-        using var transaction = conn.BeginTransaction();
+        await using var transaction = await conn.BeginTransactionAsync();
         try
         {
             int x = await transaction.ExecuteAsync(sql, dynParam);
             int y = await transaction.ExecuteAsync(sql2, dynParam2);
-            transaction.Commit();
+            await transaction.CommitAsync();
             return x == y ? x : 0;
         }
         catch (Exception ex)
         {
             try
             {
-                transaction.Rollback();
+                await transaction.RollbackAsync();
             }
             catch (Exception ex2)
             {
@@ -148,7 +148,7 @@ public class PatientRepository : Repository
         }
         finally
         {
-            conn.Close();
+            await conn.CloseAsync();
         }
     }
 
@@ -162,7 +162,7 @@ public class PatientRepository : Repository
         var dynParam = new DynamicParameters();
         dynParam.Add("@INPUT", $"%{name}%", DbType.String, ParameterDirection.Input);
 
-        using var conn = GetDbConnection();
+        await using var conn = GetDbConnection();
         return await conn.QueryAsync<Patient>(sql, dynParam);
     }
 }
