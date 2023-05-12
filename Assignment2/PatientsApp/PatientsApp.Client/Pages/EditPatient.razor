@@ -1,6 +1,7 @@
 ﻿@page "/editpatient/{id}"
-@inject HttpClient Http
+@inject PatientsClient patientClient
 @inject NavigationManager NavManager
+@attribute [Authorize(Roles = "doctor")]
 
 <PageTitle>Edit Patient</PageTitle>
 
@@ -70,7 +71,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await Http.GetAsync($"Patients/{Id}");
+        var response = await patientClient.GetPatientAsync(Id!);
         if (response.IsSuccessStatusCode)
         {
             patient = await response.Content.ReadFromJsonAsync<PatientDTO>() ?? new();
@@ -86,10 +87,10 @@
     {
         // Process the valid form
         patient.Password = BCrypt.HashPassword(patient.Email + patient.Password);
-        var response = await Http.PutAsJsonAsync($"Patients/{patient.Id}", patient);
+        var response = await patientClient.PutPatientAsync(patient);
         if (response.IsSuccessStatusCode)
         {
-            NavManager.NavigateTo("/");
+            NavManager.NavigateTo("/patients");
         }
         else
         {

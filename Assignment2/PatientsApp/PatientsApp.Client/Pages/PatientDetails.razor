@@ -1,5 +1,6 @@
 ﻿@page "/patient/{id}"
-@inject HttpClient Http
+@inject PatientsClient patientClient
+@attribute [Authorize(Roles = "doctor,patient")]
 
 <PageTitle>Patient details</PageTitle>
 
@@ -54,7 +55,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await Http.GetAsync($"Patients/{Id}");
+        var response = await patientClient.GetPatientAsync(Id!);
         if (response.IsSuccessStatusCode)
         {
             patient = await response.Content.ReadFromJsonAsync<PatientDTO>();

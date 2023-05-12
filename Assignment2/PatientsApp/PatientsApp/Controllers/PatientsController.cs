@@ -1,5 +1,7 @@
-﻿using Azure.Storage.Blobs;
+﻿using System.Data;
+using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PatientsApp.Common.DTO;
 using PatientsApp.Common.Models;
@@ -24,6 +26,7 @@ public class PatientsController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(Roles = "doctor")]
     public async Task<IActionResult> GetPatientsAsync()
     {
         var patients = await repository.GetPatientsAsync();
@@ -33,6 +36,7 @@ public class PatientsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "doctor,patient")]
     public async Task<IActionResult> GetPatientAsync(Guid id)
     {
         var patient = await repository.GetPatientAsync(id);
@@ -44,6 +48,7 @@ public class PatientsController : ControllerBase
     [HttpGet("search/{name}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "doctor")]
     public async Task<IActionResult> GetPatientsByNameAsync(string name)
     {
         var patients = await repository.SearchPatientsByNameAsync(name);
@@ -56,6 +61,7 @@ public class PatientsController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Authorize(Roles = "doctor")]
     public async Task<IActionResult> AddPatientAsync([FromForm] PatientRequest patient)
     {
         try
@@ -103,6 +109,7 @@ public class PatientsController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "doctor")]
     public async Task<IActionResult> EditPatientAsync(Guid id, Patient patient)
     {
         var updateRow = await repository.UpdatePatientAsync(new()
@@ -128,6 +135,7 @@ public class PatientsController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [Authorize(Roles = "doctor")]
     public async Task<IActionResult> DeletePatientAsync(Guid id)
     {
         var patient = await repository.GetPatientAsync(id);

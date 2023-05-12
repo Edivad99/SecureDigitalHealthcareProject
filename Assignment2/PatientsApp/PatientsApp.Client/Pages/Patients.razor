@@ -1,6 +1,8 @@
-﻿@page "/"
-@inject HttpClient Http
+﻿@page "/patients"
+@inject PatientsClient patientClient
 @inject NavigationManager NavManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize(Roles = "doctor")]
 
 <PageTitle>Patients</PageTitle>
 
@@ -44,7 +46,14 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        patients = await Http.GetFromJsonAsync<List<PatientDTO>>("Patients");
+        /*var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        if (!user.Identity!.IsAuthenticated)
+        {
+            NavManager.NavigateTo("/login");
+        }
+        */
+        patients = await patientClient.GetPatients();
     }
 
     private void Info(PatientDTO patient) => NavManager.NavigateTo($"/patient/{patient.Id.ToString()}");
@@ -53,10 +62,10 @@ else
 
     private async Task Remove(PatientDTO patient)
     {
-        var response = await Http.DeleteAsync($"Patients/{patient.Id}");
+        var response = await patientClient.DeletePatientAsync(patient.Id.ToString());
         if (response.IsSuccessStatusCode)
         {
-            patients = await Http.GetFromJsonAsync<List<PatientDTO>>("Patients");
+            patients = await patientClient.GetPatients();
             StateHasChanged();
         }
     }

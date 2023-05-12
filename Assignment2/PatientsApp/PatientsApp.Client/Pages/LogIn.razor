@@ -1,6 +1,8 @@
-﻿@page "/login"
+﻿@page "/"
+@page "/login"
 @inject IAuthenticationService AuthService
 @inject NavigationManager NavManager
+@inject AuthenticationStateProvider authStateProvider
 
 <h3>Log In</h3>
 
@@ -44,7 +46,17 @@
         try
         {
             await AuthService.LoginAsync(model);
-            NavManager.NavigateTo("/");
+            var state = await authStateProvider.GetAuthenticationStateAsync();
+
+            if (state.User.IsInRole("doctor"))
+            {
+                NavManager.NavigateTo("/patients");
+            }
+            else
+            {
+                var id = state.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                NavManager.NavigateTo($"/patient/{id}");
+            }
         }
         catch (HttpRequestException)
         {

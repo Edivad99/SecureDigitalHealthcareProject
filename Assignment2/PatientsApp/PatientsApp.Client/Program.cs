@@ -20,4 +20,6 @@ builder.Services.AddScoped(sp => new HttpClient
     //BaseAddress = new Uri("https://patientsapp-server.azurewebsites.net/")
 });
 
+builder.Services.AddScoped<PatientsClient>();
+
 await builder.Build().RunAsync();

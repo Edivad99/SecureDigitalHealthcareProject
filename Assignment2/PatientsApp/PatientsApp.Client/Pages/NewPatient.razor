@@ -1,6 +1,7 @@
 ﻿@page "/newpatient"
-@inject HttpClient Http
+@inject PatientsClient patientClient
 @inject NavigationManager NavManager
+@attribute [Authorize(Roles = "doctor")]
 
 <PageTitle>New Patient</PageTitle>
 
@@ -112,11 +113,11 @@
         content.Add(new StringContent(patient.Terms.ToString()), nameof(patient.Terms));
 
         // Process the valid form
-        var response = await Http.PostAsync("Patients", content);
+        var response = await patientClient.PostPatientAsync(content);
         if (response.IsSuccessStatusCode)
         {
             imageContent.Dispose();
-            NavManager.NavigateTo("/");
+            NavManager.NavigateTo("/patients");
         }
         else
         {
