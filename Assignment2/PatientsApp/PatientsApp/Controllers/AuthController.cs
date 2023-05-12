@@ -83,7 +83,7 @@ public class AuthController : ControllerBase
 
         /*if (!twoFactAuth.ValidateTwoFactorPIN(userDB.Key2FA, twofa_code, timeTolerance))
         {
-            return StatusCode(StatusCodes.Status404NotFound);
+            return StatusCode(StatusCodes.Status401Unauthorized);
         }*/
 
         return StatusCode(StatusCodes.Status200OK, CreateToken(userDB));

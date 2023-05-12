@@ -32,5 +32,5 @@ INSERT INTO `Users` (`Id`, `Email`, `Password`, `Role`, `Key2FA`) VALUES
 
 INSERT INTO `Patients` (`Id`, `FirstName`, `LastName`, `Gender`, `Birthdate`, `Address`, `Phone`, `Terms`, `ProfilePicture`) VALUES
 ('6fbe6a58-dcb0-422e-af55-51f072cb7eca', 'Tina', 'Anselmi', 'Female', '1927-03-25', 'Via G.Verdi', '+39 3453829984', 1, 'https://shdfiles.blob.core.windows.net/tinaanselmi/c6932ef9-d5d9-435f-99c0-42b969a7a955.jpg'),
-('cc1031a6-cfff-43c0-af19-b38eab358bdc', 'Mario', 'Rossi', 'Male', '1999-10-15', 'Via. A. Rossi', '+39 3547282733', 1, 'https://shdfiles.blob.core.windows.net/mariorossi/869586a4-e7e6-4009-8802-a83facc7346e.jpg'),
+('cc1031a6-cfff-43c0-af19-b38eab358bdc', 'Mario', 'Rossi', 'Male', '1999-10-15', 'Via A. Rossi', '+39 3547282733', 1, 'https://shdfiles.blob.core.windows.net/mariorossi/869586a4-e7e6-4009-8802-a83facc7346e.jpg'),
 ('cc7d74b3-f798-42a3-bce5-a4ac9a534c14', 'Giuseppe', 'Mazzini', 'Male', '1860-03-29', 'Via M. Giove', '+39 4930284031', 0, 'https://shdfiles.blob.core.windows.net/giuseppemazzini/ed144ff8-85a0-4bc4-a88a-4176cb7e4abf.jpg');
