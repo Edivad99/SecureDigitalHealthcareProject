@@ -58,9 +58,7 @@ else
             HideWarning = false;
             return;
         }
-        NavManager.NavigateTo("/login");
 
-        /*
         var content = await response.Content.ReadFromJsonAsync<GoogleAuthDTO>();
         if (content != null)
         {
@@ -70,6 +68,6 @@ else
                 ManualEntrySetupCode = content.ManualEntrySetupCode
             };
             showAuthenticationQR = true;
-        }*/
+        }
     }
 }

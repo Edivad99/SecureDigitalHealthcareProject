@@ -76,12 +76,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-/*builder.Services.AddAuthorization(options =>
-{
-    //Imposta tutti i controller per richiedere di default autenticazione
-    options.FallbackPolicy = options.DefaultPolicy;
-});*/
-
 builder.Services.AddScoped(_ => new TwoFactorAuthenticator());
 
 builder.Services.AddAzureClients(azureBuilder =>

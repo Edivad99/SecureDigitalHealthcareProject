@@ -23,10 +23,10 @@
         <ValidationMessage For="@(() => model.Password)" />
         <InputText type="password" id="password" class="form-control margin-input" @bind-Value="model.Password" placeholder="Password" />
     </div>
-    <!--<div class="form-row col-md-10">
+    <div class="form-row col-md-10">
         <ValidationMessage For="@(() => model.TwoFACode)" />
         <InputText type="text" id="2fa" class="form-control margin-input" @bind-Value="model.TwoFACode" placeholder="2FA Code" />
-    </div>-->
+    </div>
     <div class="row">
         <div class="btn-group col-md-12 text-right">
             <button type="submit" class="btn btn-primary">Log In</button>
@@ -36,7 +36,7 @@
 </EditForm>
 
 @code {
-    private AuthenticationUserModel model = new() { TwoFACode = "000000" };
+    private AuthenticationUserModel model = new();
     private bool showAuthenticationError = false;
 
     private async Task ExecuteLogin()

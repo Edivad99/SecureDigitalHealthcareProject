@@ -67,8 +67,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LogInAsync([FromForm(Name = "username"), Required] string username,
-                                                [FromForm(Name = "password"), Required] string password/*,
-                                                [FromForm(Name = "twofa_code"), Required] string twofa_code*/)
+                                                [FromForm(Name = "password"), Required] string password,
+                                                [FromForm(Name = "twofa_code"), Required] string twofa_code)
     {
         var userDB = await repository.GetUserByEmailAsync(username);
         if (userDB is null)
@@ -81,10 +81,10 @@ public class AuthController : ControllerBase
             return StatusCode(StatusCodes.Status404NotFound);
         }
 
-        /*if (!twoFactAuth.ValidateTwoFactorPIN(userDB.Key2FA, twofa_code, timeTolerance))
+        if (!twoFactAuth.ValidateTwoFactorPIN(userDB.Key2FA, twofa_code, timeTolerance))
         {
             return StatusCode(StatusCodes.Status401Unauthorized);
-        }*/
+        }
 
         return StatusCode(StatusCodes.Status200OK, CreateToken(userDB));
     }

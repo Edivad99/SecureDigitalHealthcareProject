@@ -15,7 +15,6 @@ public class PasswordStrength : ValidationAttribute
 
         var result = Zxcvbn.Core.EvaluatePassword(input);
         int score = result.Score;
-        Console.WriteLine(score);
         if (score >= level)
         {
             return ValidationResult.Success;
